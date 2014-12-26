@@ -1,0 +1,80 @@
+- 
+ triggers: [wrist, wrists, braces]
+ message: >
+  The wrist braces Casey wears help make typing more comfortable and prevent Repetitive Strain Injury. 
+  They probably aren't made anymore, but they're the Medi-Active ones without the thumb brace.
+-
+ triggers: [site]
+ message: 'HH Website: http://handmadehero.org/  ::  HH Forums: http://forums.handmadehero.org/'
+-
+ triggers: [old, archive]
+ message: 'Forum Archive: https://forums.handmadehero.org/jace/   ::   YT Archive: https://www.youtube.com/user/handmadeheroarchive'
+-
+ triggers: [milk, almondmilk]
+ message: >
+  One of Casey's drinks of choice is Almond Milk, a delicious and refreshing beverage. Some common brands 
+  are Silk and Almond Breeze.
+-
+ triggers: [who, casey]
+ message: >
+  Casey Muratori is a software engineer who lives in Seattle. He has done work for various companies such 
+  as RAD game tools and on games such as The Witness, and has also done fiction writing and podcasting. 
+  He started Handmade Hero to give the general public a better idea of what coding a game from scratch 
+  in C is like based on his experiences in the industry.
+-
+ triggers: [botinfo]
+ message: "I'm an IRC bot based on Cinch(https://github.com/cinchrb/cinch), clandestine adversary of Hmh_bot"
+-
+ triggers: [credits]
+ message: >
+  Thanks to alexwidener (iamdefinitelybatman), dspecht (drive137) and itsuart (isuart2), Andrew (Chronister) 
+  for their contributions to the swag Chronalrobot I ripped off so heinously.
+-
+ triggers: [buy, purchase, support]
+ message: >
+  Handmade Hero, the compiled game with art assets and full source code, can be purchased at 
+  http://handmadehero.org/#buy_now You can now also support Casey monthly at http://www.patreon.com/cmuratori
+-
+ triggers: ['q&a', qa]
+ message: > 
+  Q&A session. Please prefix questions w/ @cmuratori, @handmade_hero, or Q: .The shorter the question, and 
+  if related to the stream, the higher the chances of getting it answered."
+-
+ triggers: [game, what]
+ message: >
+  Handmade Hero is a project to build an entire game in C from scratch, no libraries. We don't know what 
+  kind of game it will be yet, but we know it will be 2D, cross-platform, and feature art by Yangtian Li 
+  as well as specially licensed music. For more information, visit http://handmadehero.org/
+-
+ triggers: [stream, about, info]
+ message: >
+  In this stream, game programmer Casey Muratori is walking us through the creation of a game from scratch 
+  in C. The game is being developed for educational purposes: he will explain what he is doing every step 
+  of the way. For more information, visit http://handmadehero.org/
+-
+ triggers: [lang, language, codein]
+ message: >
+  The language we are using in Handmade Hero is C++ coded in a C-like style. We will most likely not be 
+  using classes, inheritance, or polymorphism to any significant degree.
+-
+ triggers: [ide, emacs, editor]
+ message: >
+  Casey uses emacs to edit his code, because that is what he is used to. It is getting pretty old, 
+  so you should use whatever you feel most comfortable in.
+-
+ triggers: [keyboard, kb]
+ message: "The mechanical keyboard Casey uses is a Das Keyboard 4."
+-
+ triggers: [length, years, total]
+ message: "It is estimated that the project will take 2 years to finish at the rate of one 1-hour stream per weeknight."
+-
+ triggers: [college, school]
+ message: >
+  Casey did not go to college, he has been coding in the gaming industry since 1995. You can read his 
+  biography here: http://mollyrocket.com/casey/about.html
+-
+ triggers: [art]
+ message: "The art is done by Yangtian Li"
+-
+ triggers: [compiler, cl, mscv, clang]
+ message: "Casey compiles from a batch file using MSVC on windows, but uses Clang to compile on GNU/Linux, BSD, and OS X"
