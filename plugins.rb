@@ -85,7 +85,9 @@ class StreamSchedule
   hook :pre, :method => :database?
   def database?(m)
     if @db.nil?
-      @db = Mongo::MongoClient.new("localhost").db('cinchbot')
+      host = config[:host] || "localhost"
+      port = config[:port] || 27017
+      @db = Mongo::MongoClient.new(host, port).db('cinchbot')
     end
     return (not @db.nil?)
   end
