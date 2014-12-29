@@ -10,6 +10,9 @@ settings:
       - CurrentTime
       - StreamSchedule
       - QuoteDB
+    :options:
+      SimpleFaq:
+        :FileName: faq.yml
 
 whitelist:
   - bob

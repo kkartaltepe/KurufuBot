@@ -13,7 +13,7 @@ class SimpleFaq
     return unless isWhitelistedUserDuringStream?(m) # Make more fine grained?
 
   	if @infolist.nil?
-  		fileName = config[:infoFile] || "info.yml"
+  		fileName = config[:FileName] || "faq.yml"
 		  @infolist = YAML.load_file(fileName)
   	end
 

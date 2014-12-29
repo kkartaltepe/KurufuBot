@@ -1,3 +1,5 @@
+# modeled after https://github.com/britishtea/cinch-authentication
+
 module Cinch
 	module Extensions
 		module Database
@@ -9,9 +11,9 @@ module Cinch
 
     		def dbConnected?(m)
 				if @db.nil?
-					host = config[:host] || "localhost"
-					port = config[:port] || 27017
-					database = config[:database] || 'cinchbot'
+					host = config[:DBHost] || 'localhost'
+					port = config[:DBPort] || 27017
+					database = config[:Database] || 'cinchbot'
 					@db = Mongo::MongoClient.new(host, port).db(database)
 				end
 				return (not @db.nil?)

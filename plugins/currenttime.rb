@@ -12,8 +12,8 @@ class CurrentTime
 
   DateFormat = "%H:%M %Z on %b %d, %Y"
   ExtraMappings = {'PST' => 'US/Pacific',
-                     'CST' => 'US/Central',
-                     'MST' => 'US/Mountain'}
+                   'CST' => 'US/Central',
+                   'MST' => 'US/Mountain'}
 
   match /now|pst|PST|time$/, method: :pstTime
   def pstTime(m)

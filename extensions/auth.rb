@@ -5,7 +5,7 @@ module Cinch
     module Authentication
       def isWhitelistedUser?(m)
 	    if @config.nil?
-	      fileName = config[:configFile] || "config.yml"
+	      fileName = config[:WhitelistFile] || "config.yml"
 	      @config = YAML.load_file(fileName)
 	    end
 	    adminsAndWhitelist = @config['whitelist'].concat(@config['admins'])
@@ -14,7 +14,7 @@ module Cinch
 
 	  def isAdminUser?(m)
 	    if @config.nil?
-	      fileName = config[:configFile] || "config.yml"
+	      fileName = config[:WhitelistFile] || "config.yml"
 	      @config = YAML.load_file(fileName)
 	    end
 	    return @config['admins'].include? m.user.nick.downcase
@@ -22,9 +22,10 @@ module Cinch
 
 	  def isStreaming?(m) 
 	  	if @db.nil?
-	      host = config[:dbHost] || "localhost"
-	      port = config[:dbPort] || 27017
-	      @db = Mongo::MongoClient.new(host, port).db('cinchbot')
+	      host = config[:DBHost] || "localhost"
+	      port = config[:DBPort] || 27017
+	      database = config[:Database] || 'cinchbot'
+	      @db = Mongo::MongoClient.new(host, port).db(database)
 	    end
 	    rightNow = Time.current.utc
 	    streamTimes = @db.collection("streamtime").find({'date' => {'$gt' => rightNow - 2.hours,'$lt' => rightNow }}).to_a
