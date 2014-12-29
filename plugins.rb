@@ -5,6 +5,8 @@ require 'active_support/time_with_zone'
 require 'active_support/core_ext/numeric/time'
 require 'mongo'
 
+require './auth'
+
 # Hack to get messages to go to twitch without 
 # any processing (WHOIS will fail on twitch servers)
 class Cinch::Message
@@ -16,14 +18,13 @@ end
 
 class SimpleInfo
   include Cinch::Plugin
+  include Cinch::Extensions::Authentication
   @infolist = nil
-  @whitelist = nil
-
-  hook :pre, :for => [:listen_to], :method => :streamTime?
-  hook :pre, :for => [:listen_to], :method => :whitelisted?
 
   listen_to :channel
   def listen(m)
+    return unless isWhitelistedUserDuringStream?(m) # Make more fine grained?
+
   	if @infolist.nil?
   		fileName = config[:infoFile] || "info.yml"
 		  @infolist = YAML.load_file(fileName)
@@ -36,38 +37,30 @@ class SimpleInfo
   		end
     end
   end
-
-  def streamTime?(m) 
-    return Time.now.hour < 24 
-  end
-
-  def whitelisted?(m)
-    if @whitelist.nil?
-      fileName = config[:whitelistFile] || "whitelist.yml"
-      @whitelist = YAML.load_file(fileName)
-    end
-    return @whitelist.include? m.user.nick.downcase
-  end
 end
 
 class CurrentTime
   include Cinch::Plugin
+  include Cinch::Extensions::Authentication
+
   DateFormat = "%H:%M %Z on %b %d, %Y"
+  ExtraMappings = {'PST' => 'US/Pacific',
+                     'CST' => 'US/Central',
+                     'MST' => 'US/Mountain'}
 
   match /now|pst|PST|time$/, method: :pstTime
   def pstTime(m)
+    return unless isWhitelistedUserDuringStream?(m)
+
     Time.zone = 'US/Pacific'
     m.twitch "The current time is #{Time.zone.now.strftime(CurrentTime::DateFormat)}" 
   end
 
   match /time(?: ([\w\\\/]+))/, method: :time
   def time(m, zone)
-    if @extraMappings.nil?
-      @extraMappings = {'PST' => 'US/Pacific',
-                     'CST' => 'US/Central',
-                     'MST' => 'US/Mountain'}
-    end
-    zone = @extraMappings[zone] unless @extraMappings[zone].nil?
+    return unless isWhitelistedUserDuringStream?(m)
+
+    zone = CurrentTime::ExtraMappings[zone] unless CurrentTime::ExtraMappings[zone].nil?
     begin
       Time.zone = zone
       m.twitch "The current time is #{Time.zone.now.strftime(CurrentTime::DateFormat)}"
@@ -79,6 +72,8 @@ end
 
 class StreamSchedule
   include Cinch::Plugin
+  include Cinch::Extensions::Authentication
+
   DateFormat = "%H:%M %Z on %b %d, %Y"
 
 
@@ -92,14 +87,10 @@ class StreamSchedule
     return (not @db.nil?)
   end
 
-  # def isStreaming?
-  #   rightNow = Time.current.utc
-  #   streamTimes = @db.collection("streamtime").find({'date' => {'$gt' => rightNow - 2.hours,'$lt' => rightNow }}).to_a
-  #   return streamTimes > 0
-  # end
-
   match /isStreaming$/, method: :isCurrentlyStreaming
   def isCurrentlyStreaming(m)
+    return unless isWhitelistedUserDuringStream?(m)
+
     rightNow = Time.current.utc
     streamTimes = @db.collection("streamtime").find({'date' => {'$gt' => rightNow - 2.hours,'$lt' => rightNow }}).to_a
     
@@ -109,13 +100,14 @@ class StreamSchedule
     if(streamTimes.length == 0)
       m.twitch "No streams currently"
     else
-      toPrint = "Stream started #{hoursSince.first} hours ago"
-      m.twitch(toPrint)
+      m.twitch "Stream started #{hoursSince.first} hours ago"
     end
   end
 
   match /nextStream$/, method: :nextStreamIn
   def nextStreamIn(m)
+    return unless isWhitelistedUserDuringStream?(m)
+
     rightNow = Time.current.utc
     streams = @db.collection("streamtime").find({'date' => {'$gt' => rightNow}}).to_a
 
@@ -125,12 +117,14 @@ class StreamSchedule
 
   match /nextStreamAt$/, method: :nextStreamAt
   def nextStreamAt(m)
+    return unless isWhitelistedUserDuringStream?(m)
+
     rightNow = Time.current.utc
     streams = @db.collection("streamtime").find({'date' => {'$gt' => rightNow}}).to_a
 
     streamTimes = streams.map{|stream| stream['date']}.sort
-    Time.zone = 'US/Pacific'
     if(streamTimes.length > 0)
+      Time.zone = 'US/Pacific'
       m.twitch "Next stream at #{Time.zone.at(streamTimes.first).strftime(StreamSchedule::DateFormat)}"
     else
       m.twitch "No more streams currently scheduled, check back later."
@@ -139,9 +133,11 @@ class StreamSchedule
 
   match /schedule (.*)$/, method: :ScheduleStreams
   def ScheduleStreams(m, date)
+    return unless isAdminUser?(m)
+
     Time.zone = 'US/Pacific'
     streamTime = {'date' => Time.zone.parse(date)}
     @db.collection("streamtime").insert(streamTime)
+    m.twitch "Added stream at #{Time.zone.parse(date)}"
   end
 end
-
