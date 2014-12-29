@@ -4,7 +4,7 @@ require 'active_support/core_ext/date'
 require 'active_support/time_with_zone'
 require 'active_support/core_ext/numeric/time'
 
-require './auth'
+require './extensions/auth'
 
 class CurrentTime
   include Cinch::Plugin

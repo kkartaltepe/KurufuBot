@@ -1,4 +1,3 @@
-
 # modeled after https://github.com/britishtea/cinch-authentication
 
 module Cinch

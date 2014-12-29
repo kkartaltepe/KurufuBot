@@ -5,25 +5,20 @@ require 'active_support/core_ext/date'
 require 'active_support/time_with_zone'
 require 'active_support/core_ext/numeric/time'
 
-require './auth'
+require './extensions/auth'
+require './extensions/database'
 
 class StreamSchedule
   include Cinch::Plugin
   include Cinch::Extensions::Authentication
+  include Cinch::Extensions::Database
 
   DateFormat = "%H:%M %Z on %b %d, %Y"
   WeekDays = ["Mon", "Tue", "Wed", "Thr", "Fri", "Sat", "Sun"]
 
+  # Extension to add @db, and connect.
+  requireDb
 
-  hook :pre, :method => :database?
-  def database?(m)
-    if @db.nil?
-      host = config[:host] || "localhost"
-      port = config[:port] || 27017
-      @db = Mongo::MongoClient.new(host, port).db('cinchbot')
-    end
-    return (not @db.nil?)
-  end
 
   match /isStreaming$/, method: :isCurrentlyStreaming
   def isCurrentlyStreaming(m)

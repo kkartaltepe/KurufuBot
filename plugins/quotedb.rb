@@ -1,20 +1,16 @@
 require 'cinch'
-require './auth'
+
+require './extensions/auth'
+require './extensions/database'
 
 
 class QuoteDB
   include Cinch::Plugin
   include Cinch::Extensions::Authentication
+  include Cinch::Extensions::Database
 
-   hook :pre, :method => :database?
-   def database?(m)
-    if @db.nil?
-      host = config[:host] || "localhost"
-      port = config[:port] || 27017
-      @db = Mongo::MongoClient.new(host, port).db('cinchbot')
-    end
-    return (not @db.nil?)
-  end
+  # Extension to add @db, and connect.
+  requireDb
 
   match /(?:addquote|aq) (.+)$/, method: :addQuote
   def addQuote(m, quote)

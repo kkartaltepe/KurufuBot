@@ -1,7 +1,7 @@
 require 'cinch'
 require 'yaml'
 
-require './auth'
+require './extensions/auth'
 
 class SimpleFaq
   include Cinch::Plugin
