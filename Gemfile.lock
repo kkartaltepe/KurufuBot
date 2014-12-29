@@ -1,0 +1,20 @@
+GEM
+  specs:
+    bson (1.11.1)
+    cinch (2.1.0)
+    mongo (1.11.1)
+      bson (= 1.11.1)
+    thread_safe (0.3.4)
+    tzinfo (1.2.2)
+      thread_safe (~> 0.1)
+    tzinfo-data (1.2014.10)
+      tzinfo (>= 1.0.0)
+
+PLATFORMS
+  x64-mingw32
+
+DEPENDENCIES
+  cinch
+  mongo
+  tzinfo
+  tzinfo-data
