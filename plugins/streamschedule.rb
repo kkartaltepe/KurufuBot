@@ -1,75 +1,11 @@
 require 'cinch'
-require 'yaml'
+require 'mongo'
 require 'active_support/core_ext/time'
 require 'active_support/core_ext/date'
 require 'active_support/time_with_zone'
 require 'active_support/core_ext/numeric/time'
-require 'mongo'
 
 require './auth'
-
-# Hack to get messages to go to twitch without 
-# any processing (WHOIS will fail on twitch servers)
-class Cinch::Message
-    def twitch(string)
-        string = string.to_s.gsub('<','&lt;').gsub('>','&gt;')
-        bot.irc.send ":#{bot.config.user}!#{bot.config.user}@#{bot.config.user}.tmi.twitch.tv PRIVMSG #{channel} :#{string}"
-    end
-end
-
-class SimpleInfo
-  include Cinch::Plugin
-  include Cinch::Extensions::Authentication
-  @infolist = nil
-
-  listen_to :channel
-  def listen(m)
-    return unless isWhitelistedUserDuringStream?(m) # Make more fine grained?
-
-  	if @infolist.nil?
-  		fileName = config[:infoFile] || "info.yml"
-		  @infolist = YAML.load_file(fileName)
-  	end
-
-  	@infolist.each do |info|
-  		m.message.match(/(?:#{@prefix}#{info['triggers'].join('|')})(?: ([\@\w\d\_]*))?$/) do |match| # Match any of the triggers, capture a target name if provided.
-  			target = match[1] || m.user.nick
-  			m.twitch "#{target}: #{info['message']}"
-  		end
-    end
-  end
-end
-
-class CurrentTime
-  include Cinch::Plugin
-  include Cinch::Extensions::Authentication
-
-  DateFormat = "%H:%M %Z on %b %d, %Y"
-  ExtraMappings = {'PST' => 'US/Pacific',
-                     'CST' => 'US/Central',
-                     'MST' => 'US/Mountain'}
-
-  match /now|pst|PST|time$/, method: :pstTime
-  def pstTime(m)
-    return unless isWhitelistedUserDuringStream?(m)
-
-    Time.zone = 'US/Pacific'
-    m.twitch "The current time is #{Time.zone.now.strftime(CurrentTime::DateFormat)}" 
-  end
-
-  match /time(?: ([\w\\\/]+))/, method: :time
-  def time(m, zone)
-    return unless isWhitelistedUserDuringStream?(m)
-
-    zone = CurrentTime::ExtraMappings[zone] unless CurrentTime::ExtraMappings[zone].nil?
-    begin
-      Time.zone = zone
-      m.twitch "The current time is #{Time.zone.now.strftime(CurrentTime::DateFormat)}"
-     rescue 
-      m.twitch("Invalid Timezone")
-    end
-  end
-end
 
 class StreamSchedule
   include Cinch::Plugin
@@ -135,13 +71,15 @@ class StreamSchedule
 
   match /(week|schedule)$/, method: :scheduleForWeek
   def scheduleForWeek(m)
+    return unless isWhitelistedUserDuringStream?(m)
+
     Time.zone = 'US/Pacific'
     beginningOfWeek = Time.zone.now.beginning_of_week
     streams = @db.collection("streamtime").find({'date' => {'$gt' => beginningOfWeek.utc, '$lt' => beginningOfWeek + 1.week}}).to_a
 
-    streamTimes = streams.map{|stream| stream['date']}.sort
+    streamTimes = streams.map{|stream| stream['date'].in_time_zone}.sort
     if(streamTimes.length > 0)
-      dayAndTimes = streamTimes.map{|time| "#{StreamSchedule::WeekDays[time.wday]} at #{time.in_time_zone.strftime("%H:%M %Z")}"}
+      dayAndTimes = streamTimes.map{|time| "#{StreamSchedule::WeekDays[time.wday]} at #{time.strftime("%H:%M %Z")}"}
       m.twitch "Streams this week are #{dayAndTimes.join(" :: ")}"
     else
       m.twitch "No streams scheduled for this week"
