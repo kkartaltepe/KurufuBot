@@ -1,6 +1,7 @@
 require 'cinch'
 require 'yaml'
 require 'active_support/core_ext/time'
+require 'active_support/core_ext/date'
 require 'active_support/time_with_zone'
 require 'active_support/core_ext/numeric/time'
 require 'mongo'
@@ -75,6 +76,7 @@ class StreamSchedule
   include Cinch::Extensions::Authentication
 
   DateFormat = "%H:%M %Z on %b %d, %Y"
+  WeekDays = ["Mon", "Tue", "Wed", "Thr", "Fri", "Sat", "Sun"]
 
 
   hook :pre, :method => :database?
@@ -128,6 +130,21 @@ class StreamSchedule
       m.twitch "Next stream at #{Time.zone.at(streamTimes.first).strftime(StreamSchedule::DateFormat)}"
     else
       m.twitch "No more streams currently scheduled, check back later."
+    end
+  end
+
+  match /(week|schedule)$/, method: :scheduleForWeek
+  def scheduleForWeek(m)
+    Time.zone = 'US/Pacific'
+    beginningOfWeek = Time.zone.now.beginning_of_week
+    streams = @db.collection("streamtime").find({'date' => {'$gt' => beginningOfWeek.utc, '$lt' => beginningOfWeek + 1.week}}).to_a
+
+    streamTimes = streams.map{|stream| stream['date']}.sort
+    if(streamTimes.length > 0)
+      dayAndTimes = streamTimes.map{|time| "#{StreamSchedule::WeekDays[time.wday]} at #{time.in_time_zone.strftime("%H:%M %Z")}"}
+      m.twitch "Streams this week are #{dayAndTimes.join(" :: ")}"
+    else
+      m.twitch "No streams scheduled for this week"
     end
   end
 
