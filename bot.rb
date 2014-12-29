@@ -1,4 +1,5 @@
 require 'cinch'
+require 'yaml'
 require './plugins/simplefaq'
 require './plugins/currenttime'
 require './plugins/streamschedule'
@@ -6,10 +7,12 @@ require './plugins/quotedb'
 
 bot = Cinch::Bot.new do
   configure do |c|
-    c.server = "irc.twitch.tv"
-    c.channels = ["#kurufu2"]
-    c.nick = "Kurufu2"
-    c.password = "oauth:b3dfy82v3sqzi4kdn2mbck77pmwn0e"
+ 	config = YAML.load_file('./config.yml')
+ 	puts config
+    c.server = config['settings']['server']
+    c.channels = config['settings']['channels']
+    c.nick = config['settings']['nick']
+    c.password = config['settings']['password']
     c.plugins.plugins = [SimpleFaq, CurrentTime, StreamSchedule, QuoteDB]
   end
 end
