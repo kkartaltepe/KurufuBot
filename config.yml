@@ -1,9 +1,15 @@
 settings:
-  server: irc.twitch.tv
-  channels:
+  :server: irc.twitch.tv
+  :channels:
     - '#kurufu2'
-  nick: Kurufu2
-  password: 'oauth:b3dfy82v3sqzi4kdn2mbck77pmwn0e'
+  :nick: Kurufu2
+  :password: 'oauth:b3dfy82v3sqzi4kdn2mbck77pmwn0e'
+  :plugins:
+    :plugins:
+      - SimpleFaq
+      - CurrentTime
+      - StreamSchedule
+      - QuoteDB
 
 whitelist:
   - bob

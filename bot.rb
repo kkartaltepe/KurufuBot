@@ -8,12 +8,7 @@ require './plugins/quotedb'
 bot = Cinch::Bot.new do
   configure do |c|
  	config = YAML.load_file('./config.yml')
- 	puts config
-    c.server = config['settings']['server']
-    c.channels = config['settings']['channels']
-    c.nick = config['settings']['nick']
-    c.password = config['settings']['password']
-    c.plugins.plugins = [SimpleFaq, CurrentTime, StreamSchedule, QuoteDB]
+ 	c.load(config['settings'])
   end
 end
 
