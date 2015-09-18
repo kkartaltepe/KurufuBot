@@ -15,17 +15,17 @@ class CurrentTime
                    'CST' => 'US/Central',
                    'MST' => 'US/Mountain'}
 
-  match /now|pst|PST|time$/, method: :pstTime
+  match /(now|pst|PST|time)$/, method: :pstTime
   def pstTime(m)
-    return unless isWhitelistedUserDuringStream?(m)
+    #return unless isWhitelistedUserDuringStream?(m)
 
     Time.zone = 'US/Pacific'
     m.twitch "The current time is #{Time.zone.now.strftime(CurrentTime::DateFormat)}" 
   end
 
-  match /time(?: ([\w\\\/]+))/, method: :time
+  match /time(?: ([\w\\\/]+))$/, method: :time
   def time(m, zone)
-    return unless isWhitelistedUserDuringStream?(m)
+    #return unless isWhitelistedUserDuringStream?(m)
 
     zone = CurrentTime::ExtraMappings[zone] unless CurrentTime::ExtraMappings[zone].nil?
     begin

@@ -36,7 +36,7 @@
   http://handmadehero.org/#buy_now You can now also support Casey monthly at http://www.patreon.com/cmuratori
 -
  triggers: ['q&a', qa]
- message: > 
+ message: >
   Q&A session. Please prefix questions w/ @cmuratori, @handmade_hero, or Q: .The shorter the question, and 
   if related to the stream, the higher the chances of getting it answered."
 -
@@ -77,4 +77,12 @@
  message: "The art is done by Yangtian Li"
 -
  triggers: [compiler, cl, mscv, clang]
- message: "Casey compiles from a batch file using MSVC on windows, but uses Clang to compile on GNU/Linux, BSD, and OS X"
+ message: >
+  Casey compiles from a batch file using MSVC on windows, but uses Clang to compile on 
+  GNU/Linux, BSD, and OS X"
+-
+ triggers: [render]
+ message: >
+   We are currently using software rendering in order to implement our own renderer. Ultimately 
+   the game will take advantage of hardware acceleration (i.e. using OpenGL, Direct3D, etc.) to 
+   max out performance.

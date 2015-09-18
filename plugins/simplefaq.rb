@@ -10,15 +10,16 @@ class SimpleFaq
 
   listen_to :channel
   def listen(m)
-    return unless isWhitelistedUserDuringStream?(m) # Make more fine grained?
+    #return unless isWhitelistedUserDuringStream?(m) # Make more fine grained?
 
+    @prefix = /^!/ # Why does this get set to new line ...?
   	if @infolist.nil?
   		fileName = config[:FileName] || "faq.yml"
 		  @infolist = YAML.load_file(fileName)
   	end
 
   	@infolist.each do |info|
-  		m.message.match(/(?:#{@prefix}#{info['triggers'].join('|')})(?: ([\@\w\d\_]*))?$/) do |match| # Match any of the triggers, capture a target name if provided.
+  		m.message.match(/#{@prefix}(#{info['triggers'].join('|')})(?: ([\@\w\d\_]*))?$/) do |match| # Match any of the triggers, capture a target name if provided.
   			target = match[1] || m.user.nick
   			m.twitch "#{target}: #{info['message']}"
   		end

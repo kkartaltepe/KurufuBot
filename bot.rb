@@ -2,8 +2,9 @@ require 'cinch'
 require 'yaml'
 require './plugins/simplefaq'
 require './plugins/currenttime'
-require './plugins/streamschedule'
-require './plugins/quotedb'
+#require './plugins/streamschedule'
+#require './plugins/quotedb'
+require './plugins/bonus'
 
 bot = Cinch::Bot.new do
   configure do |c|
